@@ -109,7 +109,8 @@ const TableStore = function(table, initialState = {}) {
     filters: {},
     expandRows: [],
     defaultExpandAll: false,
-    selectOnIndeterminate: false
+    selectOnIndeterminate: false,
+    rowHeight: []
   };
 
   for (let prop in initialState) {
@@ -376,7 +377,10 @@ TableStore.prototype.mutations = {
     }
     table.$emit('select-all', selection);
     states.isAllSelected = value;
-  })
+  }),
+  setRowHeight(states, heightArr) {
+    states.rowHeight = heightArr;
+  }
 };
 
 const doFlattenColumns = (columns) => {

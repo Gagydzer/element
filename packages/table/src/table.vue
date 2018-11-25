@@ -35,6 +35,7 @@
       :class="[layout.scrollX ? `is-scrolling-${scrollPosition}` : 'is-scrolling-none']"
       :style="[bodyHeight]">
       <table-body
+        ref="tableMain"
         :context="context"
         :store="store"
         :stripe="stripe"
@@ -180,7 +181,7 @@
           :row-style="rowStyle"
           :highlight="highlightCurrentRow"
           :style="{
-            width: bodyWidth
+            width: rightFixedWidth
           }">
         </table-body>
       </div>
@@ -439,6 +440,7 @@
       },
 
       doLayout() {
+        this.layout.updateRowsHeight(this.$refs.tableMain);
         this.layout.updateColumnsWidth();
         if (this.shouldUpdateHeight) {
           this.layout.updateElsHeight();

@@ -29,6 +29,7 @@ export default {
 
   render(h) {
     const columnsHidden = this.columns.map((column, index) => this.isColumnHidden(index));
+    console.log('columnsHidden', columnsHidden)
     return (
       <table
         class="el-table__body"
@@ -44,13 +45,13 @@ export default {
           {
             this._l(this.data, (row, $index) =>
               [<tr
-                style={ this.rowStyle ? this.getRowStyle(row, $index) : null }
+                style={ this.rowStyle ? this.getRowStyle(row, $index) : null + '; ' + this.getRowHeight(row, $index) }
                 key={ this.table.rowKey ? this.getKeyOfRow(row, $index) : $index }
                 on-dblclick={ ($event) => this.handleDoubleClick($event, row) }
                 on-click={ ($event) => this.handleClick($event, row) }
                 on-contextmenu={ ($event) => this.handleContextMenu($event, row) }
-                on-mouseenter={ _ => this.handleMouseEnter($index) }
-                on-mouseleave={ _ => this.handleMouseLeave() }
+                /* on-mouseenter={ _ => this.handleMouseEnter($index) }
+                on-mouseleave={ _ => this.handleMouseLeave() } */
                 class={ [this.getRowClass(row, $index)] }>
                 {
                   this._l(this.columns, (column, cellIndex) => {
@@ -64,8 +65,8 @@ export default {
                           class={ this.getCellClass($index, cellIndex, row, column) }
                           rowspan={ rowspan }
                           colspan={ colspan }
-                          on-mouseenter={ ($event) => this.handleCellMouseEnter($event, row) }
-                          on-mouseleave={ this.handleCellMouseLeave }>
+                          /* on-mouseenter={ ($event) => this.handleCellMouseEnter($event, row) }
+                          on-mouseleave={ this.handleCellMouseLeave } */>
                           {
                             column.renderCell.call(
                               this._renderProxy,
@@ -77,7 +78,7 @@ export default {
                                 store: this.store,
                                 _self: this.context || this.table.$vnode.context
                               },
-                              columnsHidden[cellIndex]
+                              false
                             )
                           }
                         </td>
@@ -169,7 +170,10 @@ export default {
     },
 
     columns() {
-      return this.store.states.columns;
+      let columns = this.store.states.columns;
+      if (this.fixed === 'left') return columns.slice(0, this.leftFixedCount);
+      if (this.fixed === 'right') return columns.slice( columns.length - this.rightFixedCount, columns.length);
+      return columns;
     }
   },
 
@@ -181,9 +185,11 @@ export default {
 
   created() {
     this.activateTooltip = debounce(50, tooltip => tooltip.handleShowPopper());
+    
   },
 
   methods: {
+
     getKeyOfRow(row, index) {
       const rowKey = this.table.rowKey;
       if (rowKey) {
@@ -241,6 +247,13 @@ export default {
       return rowStyle;
     },
 
+    getRowHeight(row, rowIndex) {
+      if (!this.fixed) return '';
+      let h = this.store.states.rowHeight[rowIndex];
+      if (!h) return '';
+      return `height: ${h}px`;
+    },
+
     getRowClass(row, rowIndex) {
       const classes = ['el-table__row'];
       if (this.table.highlightCurrentRow && row === this.store.states.currentRow) {
@@ -283,9 +296,9 @@ export default {
     getCellClass(rowIndex, columnIndex, row, column) {
       const classes = [column.id, column.align, column.className];
 
-      if (this.isColumnHidden(columnIndex)) {
+      /* if (this.isColumnHidden(columnIndex)) {
         classes.push('is-hidden');
-      }
+      } */
 
       const cellClassName = this.table.cellClassName;
       if (typeof cellClassName === 'string') {

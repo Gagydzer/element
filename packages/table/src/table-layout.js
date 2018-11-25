@@ -49,6 +49,20 @@ class TableLayout {
     }
   }
 
+  updateRowsHeight(tableMain) {
+    if (!this.table.$ready) return Vue.nextTick(() => this.updateRowsHeight(tableMain));
+    this.store.commit('setRowHeight', this.getRowsHeight(tableMain));
+  }
+
+  getRowsHeight(tableMain) {
+    let heightArr = [];
+    tableMain.$el.querySelectorAll('tr').forEach(tr => {
+      let height = tr.getBoundingClientRect().height;
+      heightArr.push(height);
+    });
+    return heightArr;
+  }
+
   setHeight(value, prop = 'height') {
     if (Vue.prototype.$isServer) return;
     const el = this.table.$el;
@@ -193,6 +207,8 @@ class TableLayout {
       rightFixedColumns.forEach(function(column) {
         rightFixedWidth += column.realWidth || column.width;
       });
+
+      console.log('rightFixedWidth', rightFixedWidth)
 
       this.rightFixedWidth = rightFixedWidth;
     }
