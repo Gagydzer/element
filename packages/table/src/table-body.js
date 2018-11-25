@@ -29,7 +29,7 @@ export default {
 
   render(h) {
     const columnsHidden = this.columns.map((column, index) => this.isColumnHidden(index));
-    console.log('columnsHidden', columnsHidden)
+    console.log('columnsHidden', columnsHidden);
     return (
       <table
         class="el-table__body"
@@ -172,7 +172,7 @@ export default {
     columns() {
       let columns = this.store.states.columns;
       if (this.fixed === 'left') return columns.slice(0, this.leftFixedCount);
-      if (this.fixed === 'right') return columns.slice( columns.length - this.rightFixedCount, columns.length);
+      if (this.fixed === 'right') return columns.slice(columns.length - this.rightFixedCount, columns.length);
       return columns;
     }
   },
@@ -185,7 +185,7 @@ export default {
 
   created() {
     this.activateTooltip = debounce(50, tooltip => tooltip.handleShowPopper());
-    
+
   },
 
   methods: {

@@ -208,7 +208,7 @@ class TableLayout {
         rightFixedWidth += column.realWidth || column.width;
       });
 
-      console.log('rightFixedWidth', rightFixedWidth)
+      console.log('rightFixedWidth', rightFixedWidth);
 
       this.rightFixedWidth = rightFixedWidth;
     }
