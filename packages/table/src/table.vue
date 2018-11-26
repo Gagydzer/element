@@ -118,7 +118,7 @@
           :row-class-name="rowClassName"
           :row-style="rowStyle"
           :style="{
-            width: bodyWidth
+            width: layout.fixedWidth
           }">
         </table-body>
         <div
