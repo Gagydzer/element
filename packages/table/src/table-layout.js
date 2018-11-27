@@ -45,15 +45,20 @@ class TableLayout {
     const bodyWrapper = this.table.bodyWrapper;
     if (this.table.$el && bodyWrapper) {
       const body = bodyWrapper.querySelector('.el-table__body');
-      this.scrollY = body.offsetHeight > this.bodyHeight;
+      const spacerBefore = bodyWrapper.querySelector('.spacer-before');
+      const spacerAfter = bodyWrapper.querySelector('.spacer-after');
+      console.log('updateScrollY', body.offsetHeight, spacerAfter.offsetHeight, spacerBefore.offsetHeight);
+      this.scrollY = body.offsetHeight + spacerAfter.offsetHeight + spacerBefore.offsetHeight > this.bodyHeight;
     }
   }
 
+  // удалить
   updateRowsHeight(tableMain) {
     if (!this.table.$ready) return Vue.nextTick(() => this.updateRowsHeight(tableMain));
     this.store.commit('setRowHeight', this.getRowsHeight(tableMain));
   }
 
+  // удалить
   getRowsHeight(tableMain) {
     let heightArr = [];
     tableMain.$el.querySelectorAll('tr').forEach(tr => {

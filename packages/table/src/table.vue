@@ -8,11 +8,11 @@
       'el-table--group': isGroup,
       'el-table--fluid-height': maxHeight,
       'el-table--scrollable-x': layout.scrollX,
-      'el-table--scrollable-y': layout.scrollY,
+      'el-table--scrollable-y': true,
       'el-table--enable-row-hover': !store.states.isComplex,
       'el-table--enable-row-transition': (store.states.data || []).length !== 0 && (store.states.data || []).length < 100
     }, tableSize ? `el-table--${ tableSize }` : '']"
-    @mouseleave="handleMouseLeave($event)">
+    @mouseleave="handleMouseLeave($event)">  <!-- layout.scrollY -->
     <div class="hidden-columns" ref="hiddenColumns"><slot></slot></div>
     <div
       v-if="showHeader"
@@ -34,6 +34,8 @@
       ref="bodyWrapper"
       :class="[layout.scrollX ? `is-scrolling-${scrollPosition}` : 'is-scrolling-none']"
       :style="[bodyHeight]">
+      <div class="spacer-before" 
+      :style="{ height: 5 + 'px'}"></div>
       <table-body
         ref="tableMain"
         :context="context"
@@ -63,6 +65,8 @@
         ref="appendWrapper">
         <slot name="append"></slot>
       </div>
+      <div class="spacer-after" 
+      :style="{ height: store.states.scrollInfo.bottomSpacerHeight + 'px'}"></div>
     </div>
     <div
       v-if="showSummary"
@@ -110,6 +114,9 @@
           top: layout.headerHeight + 'px'
         },
         fixedBodyHeight]">
+        
+      <div class="spacer-before" 
+      :style="{ height: 5 + 'px'}"></div>
         <table-body
           fixed="left"
           :store="store"
@@ -121,12 +128,15 @@
             width: layout.fixedWidth ? layout.fixedWidth + 'px' : ''
           }">
         </table-body>
+        <div class="spacer-after" 
+      :style="{ height: store.states.scrollInfo.bottomSpacerHeight + 'px'}"></div>
         <div
           v-if="$slots.append"
           class="el-table__append-gutter"
           :style="{
             height: layout.appendHeight + 'px'
           }"></div>
+          
       </div>
       <div
         v-if="showSummary"
@@ -173,6 +183,8 @@
           top: layout.headerHeight + 'px'
         },
         fixedBodyHeight]">
+        <div class="spacer-before" 
+      :style="{ height: 5 + 'px'}"></div>
         <table-body
           fixed="right"
           :store="store"
@@ -184,6 +196,8 @@
             width: rightFixedWidth
           }">
         </table-body>
+        <div class="spacer-after" 
+      :style="{ height: store.states.scrollInfo.bottomSpacerHeight + 'px'}"></div>
       </div>
       <div
         v-if="showSummary"
@@ -263,6 +277,8 @@
       border: Boolean,
 
       rowKey: [String, Function],
+
+      rowHeight: [Number],
 
       context: {},
 
@@ -395,7 +411,8 @@
         const refs = this.$refs;
         let self = this;
 
-        this.bodyWrapper.addEventListener('scroll', function() {
+        this.bodyWrapper.addEventListener('scroll', function(e) {
+          console.log('event', e.originalEvent)
           if (headerWrapper) headerWrapper.scrollLeft = this.scrollLeft;
           if (footerWrapper) footerWrapper.scrollLeft = this.scrollLeft;
           if (refs.fixedBodyWrapper) refs.fixedBodyWrapper.scrollTop = this.scrollTop;
@@ -409,11 +426,104 @@
           } else {
             self.scrollPosition = 'middle';
           }
+          if (self.height) {
+            let minScrollTop = self.store.states.scrollInfo && self.store.states.scrollInfo.minScrollTop || null
+            let maxScrollTop = self.store.states.scrollInfo && self.store.states.scrollInfo.maxScrollTop || null
+            
+            console.log(this.scrollTop, 'minScrollTop', minScrollTop, 'maxScrollTop', maxScrollTop)
+            if (this.scrollTop > maxScrollTop) {
+              self.updateRenderRows()
+            }
+          }
         });
 
         if (this.fit) {
           addResizeListener(this.$el, this.resizeListener);
         }
+      },
+
+      updateScroll() {
+        let rowHeight = this.store.states.rh;
+        let itemsPerChunk = this.store.states.viewportInfo.itemsPerChunk
+        let itemsPerPage = this.store.states.viewportInfo.itemsPerPage
+        let scrollTop = this.bodyWrapper.scrollTop
+        let scrollMid = scrollTop + (this.bodyWrapper.clientHeight / 2)
+        let itemIndexAtScrollMid = Math.floor(scrollMid / rowHeight);
+        var itemsPerScrollArea = itemsPerPage * this.store.states.pagesToScroll;
+        var scrollAreaHeight = itemsPerScrollArea * rowHeight;
+        let firstItemIndex = Math.floor(Math.max(0, itemIndexAtScrollMid - (itemsPerChunk / 2)));
+        let lastItemIndex = firstItemIndex + itemsPerChunk// > this.itemsToShow.length - 1 - firstItemIndex 
+          // ? this.itemsToShow.length - firstItemIndex
+          // : firstItemIndex + itemsPerChunk;
+        var scrollAreaFirstItemIndex = firstItemIndex + (itemsPerChunk - itemsPerScrollArea) / 2;
+        console.log('lastItemIndex', lastItemIndex)
+        console.log('scrollAreaHeight', scrollAreaHeight)
+        let minScrollTop = scrollAreaFirstItemIndex * rowHeight
+        let maxScrollTop = minScrollTop + scrollAreaHeight
+        let topSpacerHeight = firstItemIndex * rowHeight
+          let bottomSpacerHeight = Math.max(this.itemsToShow.length - lastItemIndex, 0) * rowHeight
+        this.store.commit('updateScroll', {
+          itemsPerPage, itemsPerScrollArea, minScrollTop, maxScrollTop, topSpacerHeight, bottomSpacerHeight, firstItemIndex, lastItemIndex
+        })
+        
+      },
+
+      updateViewport() {
+        const viewPort = this.bodyWrapper
+        const lastClientHeight = viewPort.clientHeight
+        const itemsPerPage = Math.ceil(viewPort.clientHeight / this.store.states.rh)
+        const itemsPerChunk = itemsPerPage * this.store.states.pagesPerChunk
+        this.store.commit('updateViewport', { 
+          lastClientHeight, 
+          itemsPerPage,
+          itemsPerChunk
+        })
+        console.log('update')
+      },
+
+      updateRenderRows () {
+        const scroll = this.bodyWrapper.scrollTop
+        this.updateViewport()
+        this.updateScroll()
+        this.getRenderRows(scroll)
+      },
+
+      // perenesti v layout??
+      getRenderRows (scroll) {
+        const list = [];
+        let rowHeight = this.store.states.rh
+        const from = 0//this.store.states.scrollInfo.firstItemIndex
+        let currentLastIndex = this.store.states.scrollInfo.lastItemIndex
+        let i = from;
+        let last = currentLastIndex
+        console.log('getRenderRows', from, currentLastIndex)
+        
+          while( i < last  && i < this.data.length) {
+            let row = this.data[i]
+            let isShow = this.isShowInTree(row)
+
+            if (!this.isShowInTree(row)) {
+              last++
+            }
+            else{
+              if (typeof row !== 'undefined') {
+                let roww = row
+                roww.__index = i
+                list.push(roww);
+              }
+            }
+            i++
+        }
+        this.store.commit('setRenderedRows', list);
+      },
+
+      isShowInTree(row) {
+        if (!row) return false
+        let show = row.parent
+          ? row.parent._expanded && row.parent._show
+          : true
+        row._show = show
+        return show
       },
 
       resizeListener() {
@@ -440,8 +550,11 @@
       },
 
       doLayout() {
-        this.layout.updateRowsHeight(this.$refs.tableMain);
+        // this.layout.updateRowsHeight(this.$refs.tableMain);
         this.layout.updateColumnsWidth();
+        this.updateViewport();
+        this.updateScroll()
+        this.updateRenderRows(this.bodyWrapper.scrollTop)
         if (this.shouldUpdateHeight) {
           this.layout.updateElsHeight();
         }
@@ -464,6 +577,14 @@
     computed: {
       tableSize() {
         return this.size || (this.$ELEMENT || {}).size;
+      },
+
+      itemsToShow() {
+        return this.store.states.data.filter( row => this.isShowInTree(row) )
+      },
+
+      updateRenderRowsDebounced() {
+        return debounce(30, () => this.updateRenderRows())
       },
 
       bodyWrapper() {
@@ -610,6 +731,8 @@
     mounted() {
       this.bindEvents();
       this.store.updateColumns();
+
+      if (this.height) this.store.commit('setRh', this.rowHeight || 48)
       this.doLayout();
 
       this.resizeState = {

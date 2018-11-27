@@ -895,6 +895,11 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
+beautify-scrollbar@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/beautify-scrollbar/-/beautify-scrollbar-1.0.8.tgz#0ec682022064b0128739ec9b0103e5a4de03429c"
+  integrity sha512-UCA/IDiglkRxbOTqpYtqnEMiXH/XUirXgjWN2+CPFEX1Axu6vdl6n3Xd4/OV7a6alLwZtSkB66wbfYykaj51Qw==
+
 beeper@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/beeper/-/beeper-1.1.1.tgz#e6d5ea8c5dad001304a70b22638447f69cb2f809"

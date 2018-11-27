@@ -28,8 +28,6 @@ export default {
   },
 
   render(h) {
-    const columnsHidden = this.columns.map((column, index) => this.isColumnHidden(index));
-    console.log('columnsHidden', columnsHidden);
     return (
       <table
         class="el-table__body"
@@ -146,6 +144,7 @@ export default {
     },
 
     data() {
+      if (this.store.states.rh) return this.store.states.rowsRendered;
       return this.store.states.data;
     },
 
@@ -248,8 +247,9 @@ export default {
     },
 
     getRowHeight(row, rowIndex) {
-      if (!this.fixed) return '';
-      let h = this.store.states.rowHeight[rowIndex];
+      // if (!this.fixed) return '';
+      // TODO: написать нормальное определение высоты
+      let h = this.store.states.rh; // this.store.states.rowHeight[rowIndex];
       if (!h) return '';
       return `height: ${h}px`;
     },

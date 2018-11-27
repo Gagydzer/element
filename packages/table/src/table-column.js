@@ -53,14 +53,13 @@ const forced = {
     renderHeader: function(h, { column }) {
       return column.label || '#';
     },
-    renderCell: function(h, { $index, column }) {
-      let i = $index + 1;
+    renderCell: function(h, { row, $index, column }) {
+      let i = (row.__index !== undefined ? row.__index : $index) + 1;
       const index = column.index;
-
       if (typeof index === 'number') {
         i = $index + index;
       } else if (typeof index === 'function') {
-        i = index($index);
+        i = index(row.__index || $index);
       }
 
       return <div>{ i }</div>;

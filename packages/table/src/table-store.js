@@ -110,7 +110,16 @@ const TableStore = function(table, initialState = {}) {
     expandRows: [],
     defaultExpandAll: false,
     selectOnIndeterminate: false,
-    rowHeight: []
+    rowHeight: [],
+    rowsRendered: [],
+    rh: null,
+    pagesToScroll: 1,
+    pagesPerChunk: 3,
+    viewportInfo: null,
+    scrollInfo: {
+      bottomSpacerHeight: null,
+      topSpacerHeight: null
+    }
   };
 
   for (let prop in initialState) {
@@ -238,6 +247,10 @@ TableStore.prototype.mutations = {
     }
   },
 
+  updateScroll(states, value) {
+    states.scrollInfo = value;
+  },
+
   filterChange(states, options) {
     let { column, values, silent, multi } = options;
     if (values && !Array.isArray(values)) {
@@ -304,6 +317,24 @@ TableStore.prototype.mutations = {
       this.updateColumns(); // hack for dynamics insert column
       this.scheduleLayout();
     }
+  },
+
+  setSpacersHeight(states, { top, bottom }) {
+    states.spacers.top = top;
+    states.spacers.bottom = bottom;
+  },
+
+  setRh(states, rh) {
+    states.rh = rh;
+  },
+
+  updateViewport(states, info) {
+    states.viewportInfo = info;
+  },
+
+  setRenderedRows(states, list) {
+    states.rowsRendered = list;
+    Vue.nextTick(() => this.table.updateScrollY());
   },
 
   removeColumn(states, column, parent) {
