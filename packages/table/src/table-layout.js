@@ -52,8 +52,8 @@ class TableLayout {
     }
   }
 
-  // удалить
   updateRowsHeight(tableMain) {
+    console.log('updateRowsHeight', this.getRowsHeight(tableMain));
     if (!this.table.$ready) return Vue.nextTick(() => this.updateRowsHeight(tableMain));
     this.store.commit('setRowHeight', this.getRowsHeight(tableMain));
   }
@@ -61,6 +61,7 @@ class TableLayout {
   // удалить
   getRowsHeight(tableMain) {
     let heightArr = [];
+    console.log('tableMain', tableMain.$el.querySelectorAll('tr'));
     tableMain.$el.querySelectorAll('tr').forEach(tr => {
       let height = tr.getBoundingClientRect().height;
       heightArr.push(height);

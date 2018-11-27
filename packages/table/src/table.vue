@@ -550,11 +550,9 @@
       },
 
       doLayout() {
-        // this.layout.updateRowsHeight(this.$refs.tableMain);
+        this.layout.updateRowsHeight(this.$refs.tableMain);
         this.layout.updateColumnsWidth();
-        this.updateViewport();
-        this.updateScroll()
-        this.updateRenderRows(this.bodyWrapper.scrollTop)
+        if (this.height) this.updateRenderRows()
         if (this.shouldUpdateHeight) {
           this.layout.updateElsHeight();
         }

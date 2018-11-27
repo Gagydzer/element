@@ -48,8 +48,8 @@ export default {
                 on-dblclick={ ($event) => this.handleDoubleClick($event, row) }
                 on-click={ ($event) => this.handleClick($event, row) }
                 on-contextmenu={ ($event) => this.handleContextMenu($event, row) }
-                /* on-mouseenter={ _ => this.handleMouseEnter($index) }
-                on-mouseleave={ _ => this.handleMouseLeave() } */
+                on-mouseenter={ _ => this.handleMouseEnter($index) }
+                on-mouseleave={ _ => this.handleMouseLeave() }
                 class={ [this.getRowClass(row, $index)] }>
                 {
                   this._l(this.columns, (column, cellIndex) => {
@@ -63,8 +63,8 @@ export default {
                           class={ this.getCellClass($index, cellIndex, row, column) }
                           rowspan={ rowspan }
                           colspan={ colspan }
-                          /* on-mouseenter={ ($event) => this.handleCellMouseEnter($event, row) }
-                          on-mouseleave={ this.handleCellMouseLeave } */>
+                          on-mouseenter={ ($event) => this.handleCellMouseEnter($event, row) }
+                          on-mouseleave={ this.handleCellMouseLeave }>
                           {
                             column.renderCell.call(
                               this._renderProxy,
