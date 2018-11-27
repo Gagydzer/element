@@ -8,7 +8,7 @@
       'el-table--group': isGroup,
       'el-table--fluid-height': maxHeight,
       'el-table--scrollable-x': layout.scrollX,
-      'el-table--scrollable-y': true,
+      'el-table--scrollable-y': layout.scrollY,
       'el-table--enable-row-hover': !store.states.isComplex,
       'el-table--enable-row-transition': (store.states.data || []).length !== 0 && (store.states.data || []).length < 100
     }, tableSize ? `el-table--${ tableSize }` : '']"
@@ -35,7 +35,7 @@
       :class="[layout.scrollX ? `is-scrolling-${scrollPosition}` : 'is-scrolling-none']"
       :style="[bodyHeight]">
       <div class="spacer-before" 
-      :style="{ height: 5 + 'px'}"></div>
+      :style="{ height: 1 + 'px'}"></div>
       <table-body
         ref="tableMain"
         :context="context"
@@ -116,7 +116,7 @@
         fixedBodyHeight]">
         
       <div class="spacer-before" 
-      :style="{ height: 5 + 'px'}"></div>
+      :style="{ height: 1 + 'px'}"></div>
         <table-body
           fixed="left"
           :store="store"
@@ -184,7 +184,7 @@
         },
         fixedBodyHeight]">
         <div class="spacer-before" 
-      :style="{ height: 5 + 'px'}"></div>
+      :style="{ height: 1 + 'px'}"></div>
         <table-body
           fixed="right"
           :store="store"
