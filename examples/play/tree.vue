@@ -1,7 +1,7 @@
 <template>
   <el-table :data="formatData"
     v-bind="$attrs"
-    :row-height="30"
+    :row-height="25"
     ref="table"
     @row-click="toogle">
     <el-table-column :width="nameWidth" :fixed="fixedFirst">

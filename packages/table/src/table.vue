@@ -522,7 +522,7 @@
         let show = row.parent
           ? row.parent._expanded && row.parent._show
           : true
-        row._show = show
+        this.$set(row, '_show', show)
         return show
       },
 
