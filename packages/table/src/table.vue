@@ -412,7 +412,7 @@
         let self = this;
 
         this.bodyWrapper.addEventListener('scroll', function(e) {
-          console.log('event', e.originalEvent)
+          console.log('event', e.originalEvent, refs.footerWrapper)
           if (refs.headerWrapper) refs.headerWrapper.scrollLeft = this.scrollLeft;
           if (refs.footerWrapper) refs.footerWrapper.scrollLeft = this.scrollLeft;
           if (refs.fixedBodyWrapper) refs.fixedBodyWrapper.scrollTop = this.scrollTop;
