@@ -413,8 +413,8 @@
 
         this.bodyWrapper.addEventListener('scroll', function(e) {
           console.log('event', e.originalEvent)
-          if (headerWrapper) headerWrapper.scrollLeft = this.scrollLeft;
-          if (footerWrapper) footerWrapper.scrollLeft = this.scrollLeft;
+          if (refs.headerWrapper) refs.headerWrapper.scrollLeft = this.scrollLeft;
+          if (refs.footerWrapper) refs.footerWrapper.scrollLeft = this.scrollLeft;
           if (refs.fixedBodyWrapper) refs.fixedBodyWrapper.scrollTop = this.scrollTop;
           if (refs.rightFixedBodyWrapper) refs.rightFixedBodyWrapper.scrollTop = this.scrollTop;
           const maxScrollLeftPosition = this.scrollWidth - this.offsetWidth - 1;
