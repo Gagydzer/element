@@ -47,13 +47,11 @@ class TableLayout {
       const body = bodyWrapper.querySelector('.el-table__body');
       const spacerBefore = bodyWrapper.querySelector('.spacer-before');
       const spacerAfter = bodyWrapper.querySelector('.spacer-after');
-      console.log('updateScrollY', body.offsetHeight, spacerAfter.offsetHeight, spacerBefore.offsetHeight);
       this.scrollY = body.offsetHeight + spacerAfter.offsetHeight + spacerBefore.offsetHeight > this.bodyHeight;
     }
   }
 
   updateRowsHeight(tableMain) {
-    console.log('updateRowsHeight', this.getRowsHeight(tableMain));
     if (!this.table.$ready) return Vue.nextTick(() => this.updateRowsHeight(tableMain));
     this.store.commit('setRowHeight', this.getRowsHeight(tableMain));
   }
@@ -61,7 +59,6 @@ class TableLayout {
   // удалить
   getRowsHeight(tableMain) {
     let heightArr = [];
-    console.log('tableMain', tableMain.$el.querySelectorAll('tr'));
     tableMain.$el.querySelectorAll('tr').forEach(tr => {
       let height = tr.getBoundingClientRect().height;
       heightArr.push(height);
@@ -213,8 +210,6 @@ class TableLayout {
       rightFixedColumns.forEach(function(column) {
         rightFixedWidth += column.realWidth || column.width;
       });
-
-      console.log('rightFixedWidth', rightFixedWidth);
 
       this.rightFixedWidth = rightFixedWidth;
     }

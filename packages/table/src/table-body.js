@@ -48,8 +48,9 @@ export default {
                 on-dblclick={ ($event) => this.handleDoubleClick($event, row) }
                 on-click={ ($event) => this.handleClick($event, row) }
                 on-contextmenu={ ($event) => this.handleContextMenu($event, row) }
-                on-mouseenter={ _ => this.handleMouseEnter($index) }
-                on-mouseleave={ _ => this.handleMouseLeave() }
+                // on-mouseenter={ _ => this.handleMouseEnter($index) }
+                // on-mouseleave={ _ => this.handleMouseLeave() }
+                // { ...{ on: { 'mouseenter': _ => console.log('hello') } } }
                 class={ [this.getRowClass(row, $index)] }>
                 {
                   this._l(this.columns, (column, cellIndex) => {
@@ -103,7 +104,7 @@ export default {
   },
 
   watch: {
-    'store.states.hoverRow'(newVal, oldVal) {
+    /* 'store.states.hoverRow'(newVal, oldVal) {
       if (!this.store.states.isComplex) return;
       const el = this.$el;
       if (!el) return;
@@ -117,7 +118,7 @@ export default {
       if (newRow) {
         addClass(newRow, 'hover-row');
       }
-    },
+    }, */
     'store.states.currentRow'(newVal, oldVal) {
       if (!this.highlight) return;
       const el = this.$el;

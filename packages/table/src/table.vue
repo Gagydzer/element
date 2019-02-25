@@ -412,7 +412,6 @@
         let self = this;
 
         this.bodyWrapper.addEventListener('scroll', function(e) {
-          console.log('event', e.originalEvent, refs.footerWrapper)
           if (refs.headerWrapper) refs.headerWrapper.scrollLeft = this.scrollLeft;
           if (refs.footerWrapper) refs.footerWrapper.scrollLeft = this.scrollLeft;
           if (refs.fixedBodyWrapper) refs.fixedBodyWrapper.scrollTop = this.scrollTop;
@@ -430,7 +429,6 @@
             let minScrollTop = self.store.states.scrollInfo && self.store.states.scrollInfo.minScrollTop || null
             let maxScrollTop = self.store.states.scrollInfo && self.store.states.scrollInfo.maxScrollTop || null
             
-            console.log(this.scrollTop, 'minScrollTop', minScrollTop, 'maxScrollTop', maxScrollTop)
             if (this.scrollTop > maxScrollTop) {
               self.updateRenderRows()
             }
@@ -456,8 +454,6 @@
           // ? this.itemsToShow.length - firstItemIndex
           // : firstItemIndex + itemsPerChunk;
         var scrollAreaFirstItemIndex = firstItemIndex + (itemsPerChunk - itemsPerScrollArea) / 2;
-        console.log('lastItemIndex', lastItemIndex)
-        console.log('scrollAreaHeight', scrollAreaHeight)
         let minScrollTop = scrollAreaFirstItemIndex * rowHeight
         let maxScrollTop = minScrollTop + scrollAreaHeight
         let topSpacerHeight = firstItemIndex * rowHeight
@@ -478,7 +474,6 @@
           itemsPerPage,
           itemsPerChunk
         })
-        console.log('update')
       },
 
       updateRenderRows () {
@@ -496,7 +491,6 @@
         let currentLastIndex = this.store.states.scrollInfo.lastItemIndex
         let i = from;
         let last = currentLastIndex
-        console.log('getRenderRows', from, currentLastIndex)
         
           while( i < last  && i < this.data.length) {
             let row = this.data[i]
