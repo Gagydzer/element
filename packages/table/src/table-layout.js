@@ -40,6 +40,7 @@ class TableLayout {
   }
 
   updateScrollY() {
+    const a = performance.now();
     const height = this.height;
     if (typeof height !== 'string' && typeof height !== 'number') return;
     const bodyWrapper = this.table.bodyWrapper;
@@ -49,6 +50,8 @@ class TableLayout {
       const spacerAfter = bodyWrapper.querySelector('.spacer-after');
       this.scrollY = body.offsetHeight + spacerAfter.offsetHeight + spacerBefore.offsetHeight > this.bodyHeight;
     }
+    const b = performance.now();
+    console.log('updateScrollY performance', b - a);
   }
 
   updateRowsHeight(tableMain) {
@@ -56,7 +59,6 @@ class TableLayout {
     this.store.commit('setRowHeight', this.getRowsHeight(tableMain));
   }
 
-  // удалить
   getRowsHeight(tableMain) {
     let heightArr = [];
     tableMain.$el.querySelectorAll('tr').forEach(tr => {
@@ -91,6 +93,7 @@ class TableLayout {
   }
 
   updateElsHeight() {
+    const a = performance.now();
     if (!this.table.$ready) return Vue.nextTick(() => this.updateElsHeight());
     const { headerWrapper, appendWrapper, footerWrapper } = this.table.$refs;
     this.appendHeight = appendWrapper ? appendWrapper.offsetHeight : 0;
@@ -110,8 +113,10 @@ class TableLayout {
     const noData = !this.table.data || this.table.data.length === 0;
     this.viewportHeight = this.scrollX ? tableHeight - (noData ? 0 : this.gutterWidth) : tableHeight;
 
-    this.updateScrollY();
+    // this.updateScrollY();
     this.notifyObservers('scrollable');
+    const b = performance.now();
+    console.log('performance: ', b - a);
   }
 
   getFlattenColumns() {

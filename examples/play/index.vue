@@ -1,5 +1,8 @@
 <template>
   <div style="margin: 20px; width: 1000px;">
+    <router-link :to="{ name: 'temp'}">
+      <h1>temp</h1>
+    </router-link>
     <tree
     :fixedFirst="true"
     :data="dataArr"

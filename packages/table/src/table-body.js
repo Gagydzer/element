@@ -198,16 +198,6 @@ export default {
       return index;
     },
 
-    isColumnHidden(index) {
-      if (this.fixed === true || this.fixed === 'left') {
-        return index >= this.leftFixedLeafCount;
-      } else if (this.fixed === 'right') {
-        return index < this.columnsCount - this.rightFixedLeafCount;
-      } else {
-        return (index < this.leftFixedLeafCount) || (index >= this.columnsCount - this.rightFixedLeafCount);
-      }
-    },
-
     getSpan(row, column, rowIndex, columnIndex) {
       let rowspan = 1;
       let colspan = 1;
@@ -296,10 +286,6 @@ export default {
 
     getCellClass(rowIndex, columnIndex, row, column) {
       const classes = [column.id, column.align, column.className];
-
-      /* if (this.isColumnHidden(columnIndex)) {
-        classes.push('is-hidden');
-      } */
 
       const cellClassName = this.table.cellClassName;
       if (typeof cellClassName === 'string') {

@@ -86,8 +86,8 @@
       </table-footer>
     </div>
     <div
+
       v-if="fixedColumns.length > 0"
-      v-mousewheel="handleFixedMousewheel"
       class="el-table__fixed"
       ref="fixedWrapper"
       :style="[{
@@ -114,28 +114,38 @@
           top: layout.headerHeight + 'px'
         },
         fixedBodyHeight]">
-        
-      <div class="spacer-before" 
-      :style="{ height: 1 + 'px'}"></div>
-        <table-body
-          fixed="left"
-          :store="store"
-          :stripe="stripe"
-          :highlight="highlightCurrentRow"
-          :row-class-name="rowClassName"
-          :row-style="rowStyle"
-          :style="{
-            width: layout.fixedWidth ? layout.fixedWidth + 'px' : ''
-          }">
-        </table-body>
-        <div class="spacer-after" 
-      :style="{ height: store.states.scrollInfo.bottomSpacerHeight + 'px'}"></div>
-        <div
+
+        <div class="el-table__fixed-body-wrapper-inner" 
+        ref="fixedBodyWrapperInner"
+        v-mousewheel="handleFixedMousewheel"
+        :style="[
+        {
+          width: layout.fixedWidth ? layout.fixedWidth + layout.gutterWidth + 'px' : ''
+        },
+        fixedBodyHeight]">
+          <div class="spacer-before" 
+          :style="{ height: 1 + 'px'}"></div>
+            <table-body
+              ref="tableLeft"
+              fixed="left"
+              :store="store"
+              :stripe="stripe"
+              :highlight="highlightCurrentRow"
+              :row-class-name="rowClassName"
+              :row-style="rowStyle"
+              :style="{
+                width: layout.fixedWidth ? layout.fixedWidth + 'px' : ''
+              }">
+            </table-body>
+            <div class="spacer-after" 
+          :style="{ height: store.states.scrollInfo.bottomSpacerHeight + 'px'}"></div>
+          <div
           v-if="$slots.append"
           class="el-table__append-gutter"
           :style="{
             height: layout.appendHeight + 'px'
           }"></div>
+        </div>
           
       </div>
       <div
@@ -156,7 +166,7 @@
     </div>
     <div
       v-if="rightFixedColumns.length > 0"
-      v-mousewheel="handleFixedMousewheel"
+      
       class="el-table__fixed-right"
       ref="rightFixedWrapper"
       :style="[{
@@ -177,6 +187,7 @@
           }"></table-header>
       </div>
       <div
+      v-mousewheel="handleFixedMousewheel"
         class="el-table__fixed-body-wrapper"
         ref="rightFixedBodyWrapper"
         :style="[{
@@ -187,6 +198,7 @@
       :style="{ height: 1 + 'px'}"></div>
         <table-body
           fixed="right"
+          ref="tableRight"
           :store="store"
           :stripe="stripe"
           :row-class-name="rowClassName"
@@ -250,6 +262,10 @@
     directives: {
       Mousewheel
     },
+
+    data: () => ({
+      scrolling: false
+    }),
 
     props: {
       data: {
@@ -383,6 +399,7 @@
       },
 
       handleFixedMousewheel(event, data) {
+        console.log('handleFixedMousewheel', event, data)
         const bodyWrapper = this.bodyWrapper;
         if (Math.abs(data.spinY) > 0) {
           const currentScrollTop = bodyWrapper.scrollTop;
@@ -392,9 +409,9 @@
           if (data.pixelY > 0 && bodyWrapper.scrollHeight - bodyWrapper.clientHeight > currentScrollTop) {
             event.preventDefault();
           }
-          bodyWrapper.scrollTop += Math.ceil(data.pixelY / 5);
+          bodyWrapper.scrollTop += Math.ceil(data.pixelY);
         } else {
-          bodyWrapper.scrollLeft += Math.ceil(data.pixelX / 5);
+          bodyWrapper.scrollLeft += Math.ceil(data.pixelX);
         }
       },
 
@@ -410,37 +427,84 @@
         const { headerWrapper, footerWrapper } = this.$refs;
         const refs = this.$refs;
         let self = this;
-
-        this.bodyWrapper.addEventListener('scroll', function(e) {
-          if (refs.headerWrapper) refs.headerWrapper.scrollLeft = this.scrollLeft;
-          if (refs.footerWrapper) refs.footerWrapper.scrollLeft = this.scrollLeft;
-          if (refs.fixedBodyWrapper) refs.fixedBodyWrapper.scrollTop = this.scrollTop;
-          if (refs.rightFixedBodyWrapper) refs.rightFixedBodyWrapper.scrollTop = this.scrollTop;
-          const maxScrollLeftPosition = this.scrollWidth - this.offsetWidth - 1;
-          const scrollLeft = this.scrollLeft;
-          if (scrollLeft >= maxScrollLeftPosition) {
-            self.scrollPosition = 'right';
-          } else if (scrollLeft === 0) {
-            self.scrollPosition = 'left';
-          } else {
-            self.scrollPosition = 'middle';
-          }
-          if (self.height) {
-            let minScrollTop = self.store.states.scrollInfo && self.store.states.scrollInfo.minScrollTop || null
-            let maxScrollTop = self.store.states.scrollInfo && self.store.states.scrollInfo.maxScrollTop || null
-            
-            if (this.scrollTop > maxScrollTop) {
-              self.updateRenderRows()
-            }
-          }
-        });
+        this.$refs.bodyWrapper.addEventListener('scroll', this.onScroll, { passive: true });
 
         if (this.fit) {
           addResizeListener(this.$el, this.resizeListener);
         }
       },
 
-      updateScroll() {
+      unbindEvents() {
+        this.bodyWrapper.removeEventListener('scroll', this.onScroll)
+      },
+
+      onScroll(e) {
+        if (!this.scrolling) {
+          console.log('onScroll', e)
+            e.stopPropagation();
+            const { scrollLeft, scrollTop, scrollWidth, offsetWidth } = e.target
+            const refs = this.$refs;
+
+            if (refs.headerWrapper) refs.headerWrapper.scrollLeft = scrollLeft;
+            if (refs.footerWrapper) refs.footerWrapper.scrollLeft = scrollLeft;
+            if (refs.fixedBodyWrapperInner) refs.fixedBodyWrapperInner.scrollTop = scrollTop;
+            if (refs.rightFixedBodyWrapperInner) refs.rightFixedBodyWrapperInner.scrollTop = scrollTop;
+            const maxScrollLeftPosition = scrollWidth - offsetWidth - 1;
+            if (scrollLeft >= maxScrollLeftPosition) {
+              this.scrollPosition = 'right';
+            } else if (scrollLeft === 0) {
+              this.scrollPosition = 'left';
+            } else {
+              this.scrollPosition = 'middle';
+            }
+            if (this.height) {
+              let minScrollTop = this.store.states.scrollInfo && this.store.states.scrollInfo.minScrollTop || null
+              let maxScrollTop = this.store.states.scrollInfo && this.store.states.scrollInfo.maxScrollTop || null
+              
+              if (scrollTop > maxScrollTop) {
+                this.updateRenderRowsDebounced()
+                //this.updateRenderRows()
+              }
+            }
+          }
+        },
+
+      onScrollLeft(e) {
+        if (!this.scrolling) {
+          
+          e.stopPropagation();
+          const { scrollTop } = e.target
+          const refs = this.$refs;
+
+          this.scrolling = true
+          if (refs.bodyWrapper) refs.bodyWrapper.scrollTop = scrollTop
+          this.scrolling = false
+
+          /* if (refs.headerWrapper) refs.headerWrapper.scrollLeft = scrollLeft;
+          if (refs.footerWrapper) refs.footerWrapper.scrollLeft = scrollLeft;
+          if (refs.fixedBodyWrapperInner) refs.fixedBodyWrapperInner.scrollTop = scrollTop;
+          if (refs.rightFixedBodyWrapperInner) refs.rightFixedBodyWrapperInner.scrollTop = scrollTop;
+          const maxScrollLeftPosition = scrollWidth - offsetWidth - 1;
+          if (scrollLeft >= maxScrollLeftPosition) {
+            this.scrollPosition = 'right';
+          } else if (scrollLeft === 0) {
+            this.scrollPosition = 'left';
+          } else {
+            this.scrollPosition = 'middle';
+          } */
+          if (this.height) {
+            let minScrollTop = this.store.states.scrollInfo && this.store.states.scrollInfo.minScrollTop || null
+            let maxScrollTop = this.store.states.scrollInfo && this.store.states.scrollInfo.maxScrollTop || null
+            
+            if (scrollTop > maxScrollTop) {
+              this.updateRenderRowsDebounced()
+              //this.updateRenderRows()
+            }
+          }
+          }
+        },
+
+      updateScrollForVirtual() {
         let rowHeight = this.store.states.rh;
         let itemsPerChunk = this.store.states.viewportInfo.itemsPerChunk
         let itemsPerPage = this.store.states.viewportInfo.itemsPerPage
@@ -461,7 +525,6 @@
         this.store.commit('updateScroll', {
           itemsPerPage, itemsPerScrollArea, minScrollTop, maxScrollTop, topSpacerHeight, bottomSpacerHeight, firstItemIndex, lastItemIndex
         })
-        
       },
 
       updateViewport() {
@@ -477,10 +540,13 @@
       },
 
       updateRenderRows () {
+        const a = performance.now()
         const scroll = this.bodyWrapper.scrollTop
         this.updateViewport()
-        this.updateScroll()
+        this.updateScrollForVirtual()
         this.getRenderRows(scroll)
+        const b = performance.now()
+        console.log('updateRenderRows performance: ', b - a)
       },
 
       // perenesti v layout??
@@ -576,7 +642,7 @@
       },
 
       updateRenderRowsDebounced() {
-        return debounce(30, () => this.updateRenderRows())
+        return debounce(80, () => this.updateRenderRows())
       },
 
       bodyWrapper() {
@@ -673,6 +739,7 @@
           };
         }
       }
+
     },
 
     watch: {
@@ -713,10 +780,23 @@
             this.store.setExpandRowKeys(newVal);
           }
         }
-      }
+      },
+
+      /* 'fixedColumns.length': {
+        immediate: true,
+        handler: function (v, oldV) {
+          if (v && !oldV) {
+            this.$nextTick( () => {
+              console.log('set left scroll listener', this.$refs.fixedBodyWrapperInner)
+              this.$refs.fixedBodyWrapperInner.addEventListener('scroll', this.onScrollLeft, { passive: true })
+            })
+          }
+        }
+      } */
     },
 
     destroyed() {
+      this.unbindEvents()
       if (this.resizeListener) removeResizeListener(this.$el, this.resizeListener);
     },
 

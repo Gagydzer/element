@@ -2,6 +2,7 @@ import navConfig from './nav.config.json';
 import langs from './i18n/route.json';
 
 import play from './play/index.vue';
+import temp from './temp.vue';
 
 const LOAD_MAP = {
   'zh-CN': name => {
@@ -140,6 +141,12 @@ route.push({
   path: '/play',
   name: 'play',
   component: play
+});
+
+route.push({
+  path: '/temp',
+  name: 'temp',
+  component: temp
 });
 
 let userLanguage = localStorage.getItem('ELEMENT_LANGUAGE') || window.navigator.language || 'en-US';
