@@ -427,7 +427,7 @@
         const { headerWrapper, footerWrapper } = this.$refs;
         const refs = this.$refs;
         let self = this;
-        this.$refs.bodyWrapper.addEventListener('scroll', this.onScroll, { passive: true });
+        this.$refs.bodyWrapper.addEventListener('scroll', this.onScroll);
 
         if (this.fit) {
           addResizeListener(this.$el, this.resizeListener);
@@ -439,31 +439,30 @@
       },
 
       onScroll(e) {
-        if (!this.scrolling) {
-            e.stopPropagation();
-            const { scrollLeft, scrollTop, scrollWidth, offsetWidth } = e.target
-            const refs = this.$refs;
+          const { scrollLeft, scrollTop, scrollWidth, offsetWidth } = e.target
+          const refs = this.$refs;
 
-            if (refs.headerWrapper) refs.headerWrapper.scrollLeft = scrollLeft;
-            if (refs.footerWrapper) refs.footerWrapper.scrollLeft = scrollLeft;
-            if (refs.fixedBodyWrapper) refs.fixedBodyWrapper.scrollTop = scrollTop;
-            //if (refs.rightFixedBodyWrapperInner) refs.rightFixedBodyWrapperInner.scrollTop = scrollTop;
-            const maxScrollLeftPosition = scrollWidth - offsetWidth - 1;
-            if (scrollLeft >= maxScrollLeftPosition) {
-              this.scrollPosition = 'right';
-            } else if (scrollLeft === 0) {
-              this.scrollPosition = 'left';
-            } else {
-              this.scrollPosition = 'middle';
-            }
-            if (this.height) {
-              let minScrollTop = this.store.states.scrollInfo && this.store.states.scrollInfo.minScrollTop || null
-              let maxScrollTop = this.store.states.scrollInfo && this.store.states.scrollInfo.maxScrollTop || null
-              
-              if (scrollTop > maxScrollTop) {
-                this.updateRenderRowsDebounced()
-                //this.updateRenderRows()
-              }
+          if (refs.headerWrapper) refs.headerWrapper.scrollLeft = scrollLeft;
+          if (refs.footerWrapper) refs.footerWrapper.scrollLeft = scrollLeft;
+          if (refs.fixedBodyWrapper) refs.fixedBodyWrapper.scrollTop = scrollTop;
+          //if (refs.FixedBodyWrapperInner) refs.FixedBodyWrapperInner.scrollTop = scrollTop;
+          if (refs.rightFixedBodyWrapper) refs.rightFixedBodyWrapper.scrollTop = scrollTop;
+          //if (refs.rightFixedBodyWrapperInner) refs.rightFixedBodyWrapperInner.scrollTop = scrollTop;
+          const maxScrollLeftPosition = scrollWidth - offsetWidth - 1;
+          if (scrollLeft >= maxScrollLeftPosition) {
+            this.scrollPosition = 'right';
+          } else if (scrollLeft === 0) {
+            this.scrollPosition = 'left';
+          } else {
+            this.scrollPosition = 'middle';
+          }
+          if (this.height) {
+            let minScrollTop = this.store.states.scrollInfo && this.store.states.scrollInfo.minScrollTop || null
+            let maxScrollTop = this.store.states.scrollInfo && this.store.states.scrollInfo.maxScrollTop || null
+            
+            if (scrollTop > maxScrollTop) {
+              this.updateRenderRowsDebounced()
+              //this.updateRenderRows()
             }
           }
         },
@@ -539,13 +538,10 @@
       },
 
       updateRenderRows () {
-        const a = performance.now()
         const scroll = this.bodyWrapper.scrollTop
         this.updateViewport()
         this.updateScrollForVirtual()
         this.getRenderRows(scroll)
-        const b = performance.now()
-        console.log('updateRenderRows performance: ', b - a)
       },
 
       // perenesti v layout??
