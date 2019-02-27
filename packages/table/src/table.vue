@@ -110,19 +110,20 @@
       <div
         class="el-table__fixed-body-wrapper"
         ref="fixedBodyWrapper"
+        v-mousewheel="handleFixedMousewheel"
         :style="[{
           top: layout.headerHeight + 'px'
         },
         fixedBodyHeight]">
 
-        <div class="el-table__fixed-body-wrapper-inner" 
+        <!-- <div class="el-table__fixed-body-wrapper-inner" 
         ref="fixedBodyWrapperInner"
         v-mousewheel="handleFixedMousewheel"
         :style="[
         {
           width: layout.fixedWidth ? layout.fixedWidth + layout.gutterWidth + 'px' : ''
         },
-        fixedBodyHeight]">
+        fixedBodyHeight]"> -->
           <div class="spacer-before" 
           :style="{ height: 1 + 'px'}"></div>
             <table-body
@@ -145,7 +146,7 @@
           :style="{
             height: layout.appendHeight + 'px'
           }"></div>
-        </div>
+        <!-- </div> -->
           
       </div>
       <div
@@ -399,7 +400,6 @@
       },
 
       handleFixedMousewheel(event, data) {
-        console.log('handleFixedMousewheel', event, data)
         const bodyWrapper = this.bodyWrapper;
         if (Math.abs(data.spinY) > 0) {
           const currentScrollTop = bodyWrapper.scrollTop;
@@ -440,15 +440,14 @@
 
       onScroll(e) {
         if (!this.scrolling) {
-          console.log('onScroll', e)
             e.stopPropagation();
             const { scrollLeft, scrollTop, scrollWidth, offsetWidth } = e.target
             const refs = this.$refs;
 
             if (refs.headerWrapper) refs.headerWrapper.scrollLeft = scrollLeft;
             if (refs.footerWrapper) refs.footerWrapper.scrollLeft = scrollLeft;
-            if (refs.fixedBodyWrapperInner) refs.fixedBodyWrapperInner.scrollTop = scrollTop;
-            if (refs.rightFixedBodyWrapperInner) refs.rightFixedBodyWrapperInner.scrollTop = scrollTop;
+            if (refs.fixedBodyWrapper) refs.fixedBodyWrapper.scrollTop = scrollTop;
+            //if (refs.rightFixedBodyWrapperInner) refs.rightFixedBodyWrapperInner.scrollTop = scrollTop;
             const maxScrollLeftPosition = scrollWidth - offsetWidth - 1;
             if (scrollLeft >= maxScrollLeftPosition) {
               this.scrollPosition = 'right';

@@ -364,20 +364,20 @@
   }
 
   @include e(fixed-body-wrapper) {
-    position: relative;
+    position: absolute;
     left: 0;
     top: 37px;
     overflow: hidden;
     z-index: 3;
   }
 
-  @include e(fixed-body-wrapper-inner) {
+  /* @include e(fixed-body-wrapper-inner) {
     position: relative;
     top: 0;
     left: 0;
     overflow-y: scroll;
     z-index: 3;
-  }
+  } */
 
   @include e((header-wrapper, body-wrapper, footer-wrapper)) {
     width: 100%;
