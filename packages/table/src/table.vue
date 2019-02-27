@@ -32,6 +32,7 @@
     <div
       class="el-table__body-wrapper"
       ref="bodyWrapper"
+      v-mousewheel="tempMousewheel"
       :class="[layout.scrollX ? `is-scrolling-${scrollPosition}` : 'is-scrolling-none']"
       :style="[bodyHeight]">
       <div class="spacer-before" 
@@ -264,10 +265,6 @@
       Mousewheel
     },
 
-    data: () => ({
-      scrolling: false
-    }),
-
     props: {
       data: {
         type: Array,
@@ -338,8 +335,6 @@
 
       defaultSort: Object,
 
-      tooltipEffect: String,
-
       spanMethod: Function,
 
       selectOnIndeterminate: {
@@ -399,8 +394,41 @@
         this.layout.updateColumnsWidth();
       },
 
+      tempMousewheel(event, data) {
+        console.log('tempMousewheel', event,data, this.bodyWrapper.scrollTop)
+          const scrollTop = this.bodyWrapper.scrollTop + Math.ceil(data.pixelY)
+          const scrollLeft = this.bodyWrapper.scrollLeft + Math.ceil(data.pixelX)
+          const { scrollWidth, offsetWidth } = event.target
+          const refs = this.$refs;
+
+          if (refs.headerWrapper) refs.headerWrapper.scrollLeft = scrollLeft;
+          if (refs.footerWrapper) refs.footerWrapper.scrollLeft = scrollLeft;
+          if (refs.fixedBodyWrapper) refs.fixedBodyWrapper.scrollTop = scrollTop;
+          //if (refs.FixedBodyWrapperInner) refs.FixedBodyWrapperInner.scrollTop = scrollTop;
+          if (refs.rightFixedBodyWrapper) refs.rightFixedBodyWrapper.scrollTop = scrollTop;
+          //if (refs.rightFixedBodyWrapperInner) refs.rightFixedBodyWrapperInner.scrollTop = scrollTop;
+          const maxScrollLeftPosition = scrollWidth - offsetWidth - 1;
+          if (scrollLeft >= maxScrollLeftPosition) {
+            this.scrollPosition = 'right';
+          } else if (scrollLeft === 0) {
+            this.scrollPosition = 'left';
+          } else {
+            this.scrollPosition = 'middle';
+          }
+          if (this.height) {
+            let minScrollTop = this.store.states.scrollInfo && this.store.states.scrollInfo.minScrollTop || null
+            let maxScrollTop = this.store.states.scrollInfo && this.store.states.scrollInfo.maxScrollTop || null
+            
+            if (scrollTop > maxScrollTop) {
+              this.updateRenderRowsDebounced()
+              //this.updateRenderRows()
+            }
+          }
+      },
+
       handleFixedMousewheel(event, data) {
         const bodyWrapper = this.bodyWrapper;
+        console.log('hhh')
         if (Math.abs(data.spinY) > 0) {
           const currentScrollTop = bodyWrapper.scrollTop;
           if (data.pixelY < 0 && currentScrollTop !== 0) {
@@ -427,7 +455,7 @@
         const { headerWrapper, footerWrapper } = this.$refs;
         const refs = this.$refs;
         let self = this;
-        this.$refs.bodyWrapper.addEventListener('scroll', this.onScroll);
+        //this.$refs.bodyWrapper.addEventListener('scroll', this.onScroll, { passive: true });
 
         if (this.fit) {
           addResizeListener(this.$el, this.resizeListener);
@@ -435,7 +463,7 @@
       },
 
       unbindEvents() {
-        this.bodyWrapper.removeEventListener('scroll', this.onScroll)
+        //this.bodyWrapper.removeEventListener('scroll', this.onScroll)
       },
 
       onScroll(e) {
@@ -464,41 +492,6 @@
               this.updateRenderRowsDebounced()
               //this.updateRenderRows()
             }
-          }
-        },
-
-      onScrollLeft(e) {
-        if (!this.scrolling) {
-          
-          e.stopPropagation();
-          const { scrollTop } = e.target
-          const refs = this.$refs;
-
-          this.scrolling = true
-          if (refs.bodyWrapper) refs.bodyWrapper.scrollTop = scrollTop
-          this.scrolling = false
-
-          /* if (refs.headerWrapper) refs.headerWrapper.scrollLeft = scrollLeft;
-          if (refs.footerWrapper) refs.footerWrapper.scrollLeft = scrollLeft;
-          if (refs.fixedBodyWrapperInner) refs.fixedBodyWrapperInner.scrollTop = scrollTop;
-          if (refs.rightFixedBodyWrapperInner) refs.rightFixedBodyWrapperInner.scrollTop = scrollTop;
-          const maxScrollLeftPosition = scrollWidth - offsetWidth - 1;
-          if (scrollLeft >= maxScrollLeftPosition) {
-            this.scrollPosition = 'right';
-          } else if (scrollLeft === 0) {
-            this.scrollPosition = 'left';
-          } else {
-            this.scrollPosition = 'middle';
-          } */
-          if (this.height) {
-            let minScrollTop = this.store.states.scrollInfo && this.store.states.scrollInfo.minScrollTop || null
-            let maxScrollTop = this.store.states.scrollInfo && this.store.states.scrollInfo.maxScrollTop || null
-            
-            if (scrollTop > maxScrollTop) {
-              this.updateRenderRowsDebounced()
-              //this.updateRenderRows()
-            }
-          }
           }
         },
 
@@ -605,6 +598,7 @@
       },
 
       doLayout() {
+        console.log('do layout')
         this.layout.updateRowsHeight(this.$refs.tableMain);
         this.layout.updateColumnsWidth();
         if (this.height) this.updateRenderRows()
@@ -775,19 +769,7 @@
             this.store.setExpandRowKeys(newVal);
           }
         }
-      },
-
-      /* 'fixedColumns.length': {
-        immediate: true,
-        handler: function (v, oldV) {
-          if (v && !oldV) {
-            this.$nextTick( () => {
-              console.log('set left scroll listener', this.$refs.fixedBodyWrapperInner)
-              this.$refs.fixedBodyWrapperInner.addEventListener('scroll', this.onScrollLeft, { passive: true })
-            })
-          }
-        }
-      } */
+      }
     },
 
     destroyed() {

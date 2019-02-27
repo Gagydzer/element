@@ -75,25 +75,11 @@ export const orderBy = function(array, sortKey, reverse, sortMethod, sortBy) {
 };
 
 export const getColumnById = function(table, columnId) {
-  let column = null;
-  table.columns.forEach(function(item) {
-    if (item.id === columnId) {
-      column = item;
-    }
-  });
-  return column;
+  return table.columns.find(col => col.id === columnId);
 };
 
 export const getColumnByKey = function(table, columnKey) {
-  let column = null;
-  for (let i = 0; i < table.columns.length; i++) {
-    const item = table.columns[i];
-    if (item.columnKey === columnKey) {
-      column = item;
-      break;
-    }
-  }
-  return column;
+  return table.columns.find(col => col.columnKey === columnKey);
 };
 
 export const getColumnByCell = function(table, cell) {

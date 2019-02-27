@@ -1,7 +1,7 @@
 import { getCell, getColumnByCell, getRowIdentity } from './util';
 import { getStyle, hasClass, addClass, removeClass } from 'element-ui/src/utils/dom';
 import ElCheckbox from 'element-ui/packages/checkbox';
-import ElTooltip from 'element-ui/packages/tooltip';
+//import ElTooltip from 'element-ui/packages/tooltip';
 import debounce from 'throttle-debounce/debounce';
 import LayoutObserver from './layout-observer';
 
@@ -11,8 +11,7 @@ export default {
   mixins: [LayoutObserver],
 
   components: {
-    ElCheckbox,
-    ElTooltip
+    ElCheckbox
   },
 
   props: {
@@ -94,9 +93,9 @@ export default {
                 </tr>)
                 : ''
               ]
-            ).concat(
+            )/* .concat(
               <el-tooltip effect={ this.table.tooltipEffect } placement="top" ref="tooltip" content={ this.tooltipContent }></el-tooltip>
-            )
+            ) */
           }
         </tbody>
       </table>
@@ -177,16 +176,16 @@ export default {
     }
   },
 
-  data() {
+  /* data() {
     return {
       tooltipContent: ''
     };
-  },
+  }, */
 
-  created() {
+  /* created() {
     this.activateTooltip = debounce(50, tooltip => tooltip.handleShowPopper());
 
-  },
+  }, */
 
   methods: {
 
@@ -313,7 +312,7 @@ export default {
       }
 
       // 判断是否text-overflow, 如果是就显示tooltip
-      const cellChild = event.target.querySelector('.cell');
+      /* const cellChild = event.target.querySelector('.cell');
       if (!(hasClass(cellChild, 'el-tooltip') && cellChild.childNodes.length)) {
         return;
       }
@@ -334,15 +333,15 @@ export default {
         tooltip.doDestroy();
         tooltip.setExpectedState(true);
         this.activateTooltip(tooltip);
-      }
+      } */
     },
 
     handleCellMouseLeave(event) {
-      const tooltip = this.$refs.tooltip;
+      /* const tooltip = this.$refs.tooltip;
       if (tooltip) {
         tooltip.setExpectedState(false);
         tooltip.handleClosePopper();
-      }
+      } */
       const cell = getCell(event);
       if (!cell) return;
 
