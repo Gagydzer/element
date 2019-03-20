@@ -32,7 +32,6 @@
     <div
       class="el-table__body-wrapper"
       ref="bodyWrapper"
-      v-mousewheel="tempMousewheel"
       :class="[layout.scrollX ? `is-scrolling-${scrollPosition}` : 'is-scrolling-none']"
       :style="[bodyHeight]">
       <div class="spacer-before" 
@@ -87,7 +86,7 @@
       </table-footer>
     </div>
     <div
-
+      v-mousewheel="handleFixedMousewheel"
       v-if="fixedColumns.length > 0"
       class="el-table__fixed"
       ref="fixedWrapper"
@@ -428,7 +427,6 @@
 
       handleFixedMousewheel(event, data) {
         const bodyWrapper = this.bodyWrapper;
-        console.log('hhh')
         if (Math.abs(data.spinY) > 0) {
           const currentScrollTop = bodyWrapper.scrollTop;
           if (data.pixelY < 0 && currentScrollTop !== 0) {
@@ -455,7 +453,7 @@
         const { headerWrapper, footerWrapper } = this.$refs;
         const refs = this.$refs;
         let self = this;
-        //this.$refs.bodyWrapper.addEventListener('scroll', this.onScroll, { passive: true });
+        this.$refs.bodyWrapper.addEventListener('scroll', this.onScroll, { passive: true });
 
         if (this.fit) {
           addResizeListener(this.$el, this.resizeListener);
